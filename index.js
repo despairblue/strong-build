@@ -208,15 +208,17 @@ exports.build = function build(argv, callback) {
 
   function doNpmInstall(_, callback) {
     var pkg = require(path.resolve('package.json'));
-    var install = 'npm install';
+    var install = 'yarn install --pure-lockfile --mutex network';
+    var prune = 'yarn install --pure-lockfile --mutex network --production';
     if (!scripts) {
       install += ' --ignore-scripts';
+      prune += ' --ignore-scripts';
     }
     var steps = [runStep(install)];
     if (pkg.scripts && pkg.scripts.build) {
       steps.push(runStep('npm run build'));
     }
-    steps.push(runStep('npm prune --production'));
+    steps.push(runStep(prune));
     vasync.pipeline({funcs: steps}, function(er) {
       return callback(er);
     });
